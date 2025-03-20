@@ -1,0 +1,214 @@
+Mar 19 17:37:10 bot-pi systemd[1]: Failed to start blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:10 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:37:10 bot-pi systemd[1]: blackjack-bot.service: Start request repeated too quickly.
+Mar 19 17:37:10 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:10 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 5.
+Mar 19 17:37:10 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:37:10 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:37:10 bot-pi bash[1916]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:37:10 bot-pi bash[1916]:     ^
+Mar 19 17:37:10 bot-pi bash[1916]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:37:10 bot-pi bash[1916]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:37:10 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:10 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:10 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 4.
+Mar 19 17:37:10 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:37:10 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:37:10 bot-pi bash[1915]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:37:10 bot-pi bash[1915]:     ^
+Mar 19 17:37:10 bot-pi bash[1915]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:37:10 bot-pi bash[1915]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:37:10 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:09 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:09 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 3.
+Mar 19 17:37:09 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:37:09 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:37:09 bot-pi bash[1914]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:37:09 bot-pi bash[1914]:     ^
+Mar 19 17:37:09 bot-pi bash[1914]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:37:09 bot-pi bash[1914]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:37:09 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:09 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:09 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 2.
+Mar 19 17:37:09 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:37:09 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:37:09 bot-pi bash[1913]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:37:09 bot-pi bash[1913]:     ^
+Mar 19 17:37:09 bot-pi bash[1913]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:37:09 bot-pi bash[1913]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:37:09 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:09 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:37:09 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 1.
+Mar 19 17:37:09 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:37:09 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:37:09 bot-pi bash[1912]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:37:09 bot-pi bash[1912]:     ^
+Mar 19 17:37:09 bot-pi bash[1912]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:37:09 bot-pi bash[1912]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:37:09 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:59 bot-pi systemd[1]: Failed to start blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Start request repeated too quickly.
+Mar 19 17:35:59 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 5.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:35:59 bot-pi bash[1902]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:35:59 bot-pi bash[1902]:     ^
+Mar 19 17:35:59 bot-pi bash[1902]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:35:59 bot-pi bash[1902]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:35:59 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:59 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 4.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:35:59 bot-pi bash[1901]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:35:59 bot-pi bash[1901]:     ^
+Mar 19 17:35:59 bot-pi bash[1901]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:35:59 bot-pi bash[1901]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:35:59 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:59 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 3.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:35:59 bot-pi bash[1900]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:35:59 bot-pi bash[1900]:     ^
+Mar 19 17:35:59 bot-pi bash[1900]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:35:59 bot-pi bash[1900]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:35:59 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:59 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 2.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:35:59 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:35:59 bot-pi bash[1899]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:35:59 bot-pi bash[1899]:     ^
+Mar 19 17:35:59 bot-pi bash[1899]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:35:59 bot-pi bash[1899]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:35:59 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:58 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:58 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 1.
+Mar 19 17:35:58 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 17:35:58 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 17:35:58 bot-pi bash[1898]: IndentationError: expected an indented block after 'if' statement on line 187
+Mar 19 17:35:58 bot-pi bash[1898]:     ^
+Mar 19 17:35:58 bot-pi bash[1898]:     balances[str(user_id)] = 1000  # Ensure user exists but avoid duplicates
+Mar 19 17:35:58 bot-pi bash[1898]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 188
+Mar 19 17:35:58 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:58 bot-pi systemd[1]: blackjack-bot.service: Consumed 3.450s CPU time.
+Mar 19 17:35:58 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:35:58 bot-pi systemd[1]: blackjack-bot.service: Deactivated successfully.
+Mar 19 17:35:58 bot-pi bash[1869]: Logged in as Blackjack Bot#6546 (ID: 1348261046389047339)
+Mar 19 17:35:58 bot-pi systemd[1]: Stopping blackjack-bot.service - Blackjack Discord Bot...
+Mar 19 17:34:10 bot-pi bash[1869]: nextcord.errors.ApplicationInvokeError: Command raised an exception: InteractionResponded: This interaction has already been responded to before
+Mar 19 17:34:10 bot-pi bash[1869]: The above exception was the direct cause of the following exception:
+Mar 19 17:34:10 bot-pi bash[1869]: nextcord.errors.InteractionResponded: This interaction has already been responded to before
+Mar 19 17:34:10 bot-pi bash[1869]:     raise InteractionResponded(self._parent)
+Mar 19 17:34:10 bot-pi bash[1869]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/nextcord/interactions.py", line 842, in send_message
+Mar 19 17:34:10 bot-pi bash[1869]:     await ctx.response.send_message(
+Mar 19 17:34:10 bot-pi bash[1869]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 194, in blackjack_start
+Mar 19 17:34:10 bot-pi bash[1869]:     await self(interaction, *args, **kwargs)
+Mar 19 17:34:10 bot-pi bash[1869]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/nextcord/application_command.py", line 918, in invoke_callback_with_hooks
+Mar 19 17:34:10 bot-pi bash[1869]: Traceback (most recent call last):
+Mar 19 17:34:10 bot-pi bash[1869]: Ignoring exception in command <nextcord.application_command.SlashApplicationCommand object at 0x7f8e9a6510>:
+Mar 19 17:20:16 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:20:16 bot-pi systemd[1]: blackjack-bot.service: Consumed 3.864s CPU time.
+Mar 19 17:20:16 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 17:20:16 bot-pi systemd[1]: blackjack-bot.service: Deactivated successfully.
+Mar 19 17:20:15 bot-pi bash[1792]: Logged in as Blackjack Bot#6546 (ID: 1348261046389047339)
+Mar 19 17:20:15 bot-pi systemd[1]: Stopping blackjack-bot.service - Blackjack Discord Bot...
+Mar 19 16:30:31 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 16:30:31 bot-pi systemd[1]: blackjack-bot.service: Consumed 2.876s CPU time.
+Mar 19 16:30:31 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 16:30:31 bot-pi systemd[1]: blackjack-bot.service: Deactivated successfully.
+Mar 19 16:30:31 bot-pi bash[1755]: Logged in as Blackjack Bot#6546 (ID: 1348261046389047339)
+Mar 19 16:30:31 bot-pi systemd[1]: Stopping blackjack-bot.service - Blackjack Discord Bot...
+Mar 19 16:16:10 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 16:16:10 bot-pi systemd[1]: blackjack-bot.service: Consumed 2.755s CPU time.
+Mar 19 16:16:10 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 16:16:10 bot-pi systemd[1]: blackjack-bot.service: Deactivated successfully.
+Mar 19 16:16:10 bot-pi bash[1733]: Logged in as Blackjack Bot#6546 (ID: 1348261046389047339)
+Mar 19 16:16:10 bot-pi systemd[1]: Stopping blackjack-bot.service - Blackjack Discord Bot...
+Mar 19 16:09:55 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 16:09:55 bot-pi systemd[1]: blackjack-bot.service: Consumed 2.858s CPU time.
+Mar 19 16:09:55 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 16:09:55 bot-pi systemd[1]: blackjack-bot.service: Deactivated successfully.
+Mar 19 16:09:55 bot-pi bash[1695]: Logged in as Blackjack Bot#6546 (ID: 1348261046389047339)
+Mar 19 16:09:55 bot-pi systemd[1]: Stopping blackjack-bot.service - Blackjack Discord Bot...
+Mar 19 16:08:18 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 16:08:03 bot-pi systemd[1]: blackjack-bot.service: Consumed 3.961s CPU time.
+Mar 19 16:08:03 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 16:08:03 bot-pi systemd[1]: blackjack-bot.service: Deactivated successfully.
+Mar 19 16:08:02 bot-pi bash[791]: Logged in as Blackjack Bot#6546 (ID: 1348261046389047339)
+Mar 19 16:08:02 bot-pi systemd[1]: Stopping blackjack-bot.service - Blackjack Discord Bot...
+Mar 19 15:35:26 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 15:35:26 bot-pi systemd[1]: blackjack-bot.service: Consumed 3.324s CPU time.
+Mar 19 15:35:26 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 15:35:26 bot-pi systemd[1]: blackjack-bot.service: Scheduled restart job, restart counter is at 1.
+Mar 19 15:35:25 bot-pi systemd[1]: blackjack-bot.service: Consumed 3.324s CPU time.
+Mar 19 15:35:25 bot-pi systemd[1]: blackjack-bot.service: Failed with result 'exit-code'.
+Mar 19 15:35:25 bot-pi systemd[1]: blackjack-bot.service: Main process exited, code=exited, status=1/FAILURE
+Mar 19 15:35:25 bot-pi bash[547]: aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host discord.com:443 ssl:default [Temporary failure in name resolution]
+Mar 19 15:35:25 bot-pi bash[547]:     raise ClientConnectorDNSError(req.connection_key, exc) from exc
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/aiohttp/connector.py", line 1371, in _create_direct_connection
+Mar 19 15:35:25 bot-pi bash[547]:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     _, proto = await self._create_direct_connection(req, traces, timeout)
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/aiohttp/connector.py", line 1056, in _create_connection
+Mar 19 15:35:25 bot-pi bash[547]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     proto = await self._create_connection(req, traces, timeout)
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/aiohttp/connector.py", line 548, in connect
+Mar 19 15:35:25 bot-pi bash[547]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     conn = await self._connector.connect(
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/aiohttp/client.py", line 703, in _request
+Mar 19 15:35:25 bot-pi bash[547]:                            ^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     self._resp: _RetType = await self._coro
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/aiohttp/client.py", line 1425, in __aenter__
+Mar 19 15:35:25 bot-pi bash[547]:     async with self.__session.request(method, url, **kwargs) as response:
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/nextcord/http.py", line 299, in request
+Mar 19 15:35:25 bot-pi bash[547]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     data = await self.request(Route("GET", "/users/@me"))
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/nextcord/http.py", line 446, in static_login
+Mar 19 15:35:25 bot-pi bash[547]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     data = await self.http.static_login(token.strip())
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/nextcord/client.py", line 657, in login
+Mar 19 15:35:25 bot-pi bash[547]:     await self.login(token)
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/nextcord/client.py", line 820, in start
+Mar 19 15:35:25 bot-pi bash[547]:     await self.start(*args, **kwargs)
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/nextcord/client.py", line 857, in runner
+Mar 19 15:35:25 bot-pi bash[547]:            ^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     return future.result()
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/nextcord/client.py", line 878, in run
+Mar 19 15:35:25 bot-pi bash[547]:     bot.run(token)
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/blackjack_bot.py", line 421, in <module>
+Mar 19 15:35:25 bot-pi bash[547]: Traceback (most recent call last):
+Mar 19 15:35:25 bot-pi bash[547]: The above exception was the direct cause of the following exception:
+Mar 19 15:35:25 bot-pi bash[547]: socket.gaierror: [Errno -3] Temporary failure in name resolution
+Mar 19 15:35:25 bot-pi bash[547]:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+Mar 19 15:35:25 bot-pi bash[547]:   File "/usr/lib/python3.11/socket.py", line 962, in getaddrinfo
+Mar 19 15:35:25 bot-pi bash[547]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     result = self.fn(*self.args, **self.kwargs)
+Mar 19 15:35:25 bot-pi bash[547]:   File "/usr/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+Mar 19 15:35:25 bot-pi bash[547]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     return await self.run_in_executor(
+Mar 19 15:35:25 bot-pi bash[547]:   File "/usr/lib/python3.11/asyncio/base_events.py", line 867, in getaddrinfo
+Mar 19 15:35:25 bot-pi bash[547]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     infos = await self._loop.getaddrinfo(
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/aiohttp/resolver.py", line 39, in resolve
+Mar 19 15:35:25 bot-pi bash[547]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     addrs = await self._resolver.resolve(host, port, family=self._family)
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/aiohttp/connector.py", line 1026, in _resolve_host_with_throttle
+Mar 19 15:35:25 bot-pi bash[547]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     return await asyncio.shield(resolved_host_task)
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/aiohttp/connector.py", line 995, in _resolve_host
+Mar 19 15:35:25 bot-pi bash[547]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 19 15:35:25 bot-pi bash[547]:     hosts = await self._resolve_host(host, port, traces=traces)
+Mar 19 15:35:25 bot-pi bash[547]:   File "/home/lesliesmith/blackjack-bot/venv/lib/python3.11/site-packages/aiohttp/connector.py", line 1365, in _create_direct_connection
+Mar 19 15:35:25 bot-pi bash[547]: Traceback (most recent call last):
+Mar 19 15:35:17 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.
+-- Boot 23a8a4bc82294c538199d86e7e9b8438 --
+Mar 19 15:35:11 bot-pi systemd[1]: blackjack-bot.service: Consumed 2.940s CPU time.
+Mar 19 15:35:11 bot-pi systemd[1]: Stopped blackjack-bot.service - Blackjack Discord Bot.
+Mar 19 15:35:11 bot-pi systemd[1]: blackjack-bot.service: Deactivated successfully.
+Mar 19 15:35:10 bot-pi bash[2244]: Logged in as Blackjack Bot#6546 (ID: 1348261046389047339)
+Mar 19 15:35:10 bot-pi systemd[1]: Stopping blackjack-bot.service - Blackjack Discord Bot...
+Mar 19 15:34:26 bot-pi systemd[1]: Started blackjack-bot.service - Blackjack Discord Bot.

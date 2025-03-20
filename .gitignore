@@ -1,0 +1,7 @@
+# Ignore the environment and config files
+.env
+venv/
+__pycache__/
+*.log
+balances.json
+
