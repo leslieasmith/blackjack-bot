@@ -65,7 +65,8 @@ class PlayerState:
 # 3) Blackjack Game Logic
 ##############################
 class BlackjackGame:
-    def __init__(self):
+    def __init__(self, host_id: int):
+        self.host_id = host_id      # Store the ID of the user who started the game
         self.players = []
         self.dealer_hand = []
         self.deck = self._make_deck()
@@ -155,7 +156,26 @@ async def ping(ctx: Interaction):
     await ctx.response.send_message("Pong!", ephemeral=True)
 
 ##############################
-# 5) Start Game Command
+# 5) Replenish Command (NEW)
+##############################
+@bot.slash_command(description="Replenish your balance to 100 if you have 0 chips.")
+async def blackjack_replenish(ctx: Interaction):
+    user_id = str(ctx.user.id)
+    current_balance = balances.get(user_id, 0)
+    if current_balance > 0:
+        await ctx.response.send_message(
+            f"You still have {current_balance} chips! Replenish is only for those at 0 chips.",
+            ephemeral=True
+        )
+        return
+    balances[user_id] = 100
+    await ctx.response.send_message(
+        "Your balance has been replenished to 100 chips!",
+        ephemeral=True
+    )
+
+##############################
+# 6) Start Game Command (MODIFIED)
 ##############################
 @bot.slash_command(description="Start a new game of Blackjack with a bet (min: 10, max: 500).")
 async def blackjack_start(ctx: Interaction, bet: int):
@@ -165,20 +185,29 @@ async def blackjack_start(ctx: Interaction, bet: int):
         await ctx.response.send_message("A game is already in progress!", ephemeral=True)
         return
     if bet < MIN_BET or bet > MAX_BET:
-        await ctx.response.send_message(f"Bets must be between {MIN_BET} and {MAX_BET} chips.", ephemeral=True)
+        await ctx.response.send_message(
+            f"Bets must be between {MIN_BET} and {MAX_BET} chips.",
+            ephemeral=True
+        )
         return
     user_id = str(ctx.user.id)
     balances.setdefault(user_id, 1000)
-    # If user has run out of coins, top up and send a message without starting a game.
+    # If user has 0 chips, instruct them to use replenish command.
     if balances[user_id] <= 0:
-        balances[user_id] = 100
-        await ctx.response.send_message("You're so bad at Blackjack you have run out of chips! Your balance has been topped up with 100 chips. Please place a new bet to start a game.", ephemeral=True)
+        await ctx.response.send_message(
+            "You have 0 chips. Please run `/blackjack_replenish` to get 100 chips, then try again.",
+            ephemeral=True
+        )
         return
     if bet > balances[user_id]:
-        await ctx.response.send_message(f"You only have {balances[user_id]} chips!", ephemeral=True)
+        await ctx.response.send_message(
+            f"You only have {balances[user_id]} chips!",
+            ephemeral=True
+        )
         return
 
-    game = BlackjackGame()
+    # Create a new game with the host's ID.
+    game = BlackjackGame(ctx.user.id)
     games[ctx.channel_id] = game
 
     balances[user_id] -= bet
@@ -191,7 +220,7 @@ async def blackjack_start(ctx: Interaction, bet: int):
     )
 
 ##############################
-# 6) Join Game Command
+# 7) Join Game Command (MODIFIED)
 ##############################
 @bot.slash_command(description="Join an active Blackjack game before cards are dealt.")
 async def blackjack_join(ctx: Interaction, bet: int):
@@ -205,12 +234,25 @@ async def blackjack_join(ctx: Interaction, bet: int):
         await ctx.response.send_message("Cards already dealt, you can't join now!", ephemeral=True)
         return
     if bet < MIN_BET or bet > MAX_BET:
-        await ctx.response.send_message(f"Bets must be between {MIN_BET} and {MAX_BET} chips.", ephemeral=True)
+        await ctx.response.send_message(
+            f"Bets must be between {MIN_BET} and {MAX_BET} chips.",
+            ephemeral=True
+        )
         return
     user_id = str(ctx.user.id)
     balances.setdefault(user_id, 1000)
+    # If user has 0 chips, instruct them to use replenish command.
+    if balances[user_id] <= 0:
+        await ctx.response.send_message(
+            "You have 0 chips. Please run `/blackjack_replenish` to get 100 chips, then try again.",
+            ephemeral=True
+        )
+        return
     if bet > balances[user_id]:
-        await ctx.response.send_message(f"You only have {balances[user_id]} chips!", ephemeral=True)
+        await ctx.response.send_message(
+            f"You only have {balances[user_id]} chips!",
+            ephemeral=True
+        )
         return
 
     balances[user_id] -= bet
@@ -222,7 +264,7 @@ async def blackjack_join(ctx: Interaction, bet: int):
     )
 
 ##############################
-# 7) Deal Cards Command
+# 8) Deal Cards Command
 ##############################
 @bot.slash_command(description="Deal cards. The dealer's first card is revealed publicly.")
 async def blackjack_deal(ctx: Interaction):
@@ -248,7 +290,7 @@ async def blackjack_deal(ctx: Interaction):
     )
 
 ##############################
-# 8) Show My Hand Command
+# 9) Show My Hand Command
 ##############################
 @bot.slash_command(description="View your current hand privately.")
 async def blackjack_myhand(ctx: Interaction):
@@ -265,7 +307,7 @@ async def blackjack_myhand(ctx: Interaction):
     await ctx.response.send_message(f"Your current hand: {player.hand} (Value: {val})", ephemeral=True)
 
 ##############################
-# 9) Hit Command
+# 10) Hit Command
 ##############################
 @bot.slash_command(description="Take another card.")
 async def blackjack_hit(ctx: Interaction):
@@ -290,7 +332,7 @@ async def blackjack_hit(ctx: Interaction):
         await end_game_followup(ctx)
 
 ##############################
-# 10) Stand Command
+# 11) Stand Command
 ##############################
 @bot.slash_command(description="Keep your current hand.")
 async def blackjack_stand(ctx: Interaction):
@@ -311,15 +353,24 @@ async def blackjack_stand(ctx: Interaction):
         await end_game_followup(ctx)
 
 ##############################
-# 11) Manual End Command
+# 12) Manual End Command (MODIFIED)
 ##############################
 @bot.slash_command(description="Manually end the game.")
 async def blackjack_end(ctx: Interaction):
-    """Manually end the game."""
-    game = games.pop(ctx.channel_id, None)
+    game = games.get(ctx.channel_id)
     if not game:
         await ctx.response.send_message("No game is active.", ephemeral=True)
         return
+    # Restrict ending the game to the host or someone who is a participant.
+    if ctx.user.id != game.host_id and not any(p.user_id == ctx.user.id for p in game.players):
+        await ctx.response.send_message(
+            "You are not part of this game, so you cannot end it.",
+            ephemeral=True
+        )
+        return
+
+    # Remove the game from active games.
+    game = games.pop(ctx.channel_id, None)
     game.dealer_draw()
     lines = game.distribute_pot()
     game.end_game()
@@ -333,7 +384,7 @@ async def blackjack_end(ctx: Interaction):
     await ctx.response.send_message("\n".join(summary), ephemeral=False)
 
 ##############################
-# 12) End Game Followup Helper
+# 13) End Game Followup Helper
 ##############################
 async def end_game_followup(ctx: Interaction):
     game = games.pop(ctx.channel_id, None)
@@ -353,7 +404,7 @@ async def end_game_followup(ctx: Interaction):
     await ctx.followup.send("\n".join(summary), ephemeral=False)
 
 ##############################
-# 13) Help Command
+# 14) Help Command
 ##############################
 @bot.slash_command(description="Get help using this bot.")
 async def help(ctx: Interaction):
@@ -365,12 +416,13 @@ async def help(ctx: Interaction):
     embed.add_field(name="/blackjack_myhand", value="View your current hand privately.", inline=False)
     embed.add_field(name="/blackjack_hit", value="Draw another card.", inline=False)
     embed.add_field(name="/blackjack_stand", value="Keep your current hand.", inline=False)
-    embed.add_field(name="/blackjack_end", value="Manually end the current game.", inline=False)
+    embed.add_field(name="/blackjack_end", value="Manually end the current game (host or participant only).", inline=False)
+    embed.add_field(name="/blackjack_replenish", value="Replenish your chips to 100 if you have 0.", inline=False)
     embed.add_field(name="/blackjack_leaderboard", value="See the top players and their chip balances.", inline=False)
     await ctx.response.send_message(embed=embed)
 
 ##############################
-# 14) Leaderboard Command
+# 15) Leaderboard Command
 ##############################
 @bot.slash_command(description="See the top players and their chip balances.")
 async def blackjack_leaderboard(ctx: Interaction):
@@ -384,7 +436,7 @@ async def blackjack_leaderboard(ctx: Interaction):
     await ctx.response.send_message("\n".join(lines), ephemeral=False)
 
 ##############################
-# 15) Bot Ready & Run
+# 16) Bot Ready & Run
 ##############################
 @bot.event
 async def on_ready():
