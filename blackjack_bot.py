@@ -569,7 +569,7 @@ async def blackjack_start(ctx: Interaction, bet: int):
     desc = (
         f"💰 **Pot:** {game.pot} chips\n"
         f"Players Joined: <@{ctx.user.id}>\n"
-        "Click **Join Game** to open a bet modal.\n"
+        "Click **Join Game** to open a bet.\n"
         "Host, click **Deal Cards** when ready."
     )
     embed = Embed(
