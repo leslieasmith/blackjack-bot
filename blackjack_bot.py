@@ -5,7 +5,7 @@ import json
 import asyncio
 import nextcord
 from nextcord.ext import commands
-from nextcord import Interaction, Embed
+from nextcord import Interaction, Embed, AllowedMentions  # NEW
 import logging
 from PIL import Image
 from io import BytesIO
@@ -134,14 +134,17 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
        2) Results + Updated Balances
     """
     games.pop(ctx.channel_id, None)
+    # Dealer draws final
     game.dealer_draw()
+    # Distribute pot
     lines = game.distribute_pot()
+    # End the game
     game.end_game()
 
     d_val = game.hand_value(game.dealer_hand)
     dealer_img_bytes = generate_hand_image(game.dealer_hand)
 
-    # (1) Send the final hand image first (public)
+    # (1) Dealer final hand image embed
     if dealer_img_bytes:
         embed_image = Embed(
             title="🏁 Blackjack — Game Over",
@@ -166,7 +169,7 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
         else:
             await ctx.response.send_message(embed=embed_image)
 
-    # (2) Then send the results + balances in a second message
+    # (2) Results + balances
     desc_parts = []
     if lines:
         desc_parts.append("**Results**")
@@ -210,6 +213,7 @@ class BlackjackGame:
         self.game_over = False
         self.pot = 0
         self.dealt_cards = False
+        self.lock = asyncio.Lock()  # NEW: concurrency lock
 
     def _make_deck(self):
         suits = ["♠", "♥", "♦", "♣"]
@@ -424,55 +428,58 @@ class HitButton(nextcord.ui.Button):
         if not game:
             await interaction.response.send_message("No active game.", ephemeral=True)
             return
-        player = next((p for p in game.players if p.user_id == self.player_id), None)
-        if not player:
-            await interaction.response.send_message("You're not in this game.", ephemeral=True)
-            return
-        if player.is_done():
-            await interaction.response.send_message("You already busted or stood.", ephemeral=True)
-            return
 
-        game.draw_card_for_player(player)
-        drawn_card = player.hand[-1]
-        drawn_card_str = f"{drawn_card[0]}{drawn_card[1]}"
-        new_val = game.hand_value(player.hand)
+        # NEW: concurrency lock to avoid multi-draw collisions
+        async with game.lock:
+            player = next((p for p in game.players if p.user_id == self.player_id), None)
+            if not player:
+                await interaction.response.send_message("You're not in this game.", ephemeral=True)
+                return
+            if player.is_done():
+                await interaction.response.send_message("You already busted or stood.", ephemeral=True)
+                return
 
-        img_bytes = generate_hand_image(player.hand)
-        if new_val > 21:
-            player.busted = True
-            wait_msg = " Waiting for other players..." if len(game.players) > 1 else ""
-            if img_bytes:
-                file = nextcord.File(fp=img_bytes, filename="hand.png")
-                await interaction.response.send_message(
-                    content=(
-                        f"❌ You drew **{drawn_card_str}** and busted with **{new_val}**!{wait_msg}"
-                    ),
-                    file=file,
-                    ephemeral=True
-                )
+            game.draw_card_for_player(player)
+            drawn_card = player.hand[-1]
+            drawn_card_str = f"{drawn_card[0]}{drawn_card[1]}"
+            new_val = game.hand_value(player.hand)
+
+            img_bytes = generate_hand_image(player.hand)
+            if new_val > 21:
+                player.busted = True
+                wait_msg = " Waiting for other players..." if len(game.players) > 1 else ""
+                if img_bytes:
+                    file = nextcord.File(fp=img_bytes, filename="hand.png")
+                    await interaction.response.send_message(
+                        content=(
+                            f"❌ You drew **{drawn_card_str}** and busted with **{new_val}**!{wait_msg}"
+                        ),
+                        file=file,
+                        ephemeral=True
+                    )
+                else:
+                    await interaction.response.send_message(
+                        f"❌ You drew **{drawn_card_str}** and busted with **{new_val}**!{wait_msg}",
+                        ephemeral=True
+                    )
             else:
-                await interaction.response.send_message(
-                    f"❌ You drew **{drawn_card_str}** and busted with **{new_val}**!{wait_msg}",
-                    ephemeral=True
-                )
-        else:
-            if img_bytes:
-                file = nextcord.File(fp=img_bytes, filename="hand.png")
-                await interaction.response.send_message(
-                    content=f"🂠 Your current hand value: **{new_val}**",
-                    file=file,
-                    view=PrivatePlayerView(player.user_id),
-                    ephemeral=True
-                )
-            else:
-                await interaction.response.send_message(
-                    content=f"🂠 Your current hand value: **{new_val}**",
-                    view=PrivatePlayerView(player.user_id),
-                    ephemeral=True
-                )
+                if img_bytes:
+                    file = nextcord.File(fp=img_bytes, filename="hand.png")
+                    await interaction.response.send_message(
+                        content=f"🂠 Your current hand value: **{new_val}**",
+                        file=file,
+                        view=PrivatePlayerView(player.user_id),
+                        ephemeral=True
+                    )
+                else:
+                    await interaction.response.send_message(
+                        content=f"🂠 Your current hand value: **{new_val}**",
+                        view=PrivatePlayerView(player.user_id),
+                        ephemeral=True
+                    )
 
-        if game.all_players_done():
-            await process_end_game(interaction, game, followup=True)
+            if game.all_players_done():
+                await process_end_game(interaction, game, followup=True)
 
 class StandButton(nextcord.ui.Button):
     def __init__(self, player_id: int):
@@ -484,23 +491,26 @@ class StandButton(nextcord.ui.Button):
         if not game:
             await interaction.response.send_message("No active game.", ephemeral=True)
             return
-        player = next((p for p in game.players if p.user_id == self.player_id), None)
-        if not player:
-            await interaction.response.send_message("You're not in this game.", ephemeral=True)
-            return
-        if player.is_done():
-            await interaction.response.send_message("You already busted or stood.", ephemeral=True)
-            return
 
-        player.stood = True
-        wait_msg = " Waiting for other players..." if (len(game.players) > 1) else ""
-        await interaction.response.send_message(
-            f"<@{player.user_id}> stands.{wait_msg}",
-            ephemeral=True
-        )
+        # concurrency lock for stand as well
+        async with game.lock:
+            player = next((p for p in game.players if p.user_id == self.player_id), None)
+            if not player:
+                await interaction.response.send_message("You're not in this game.", ephemeral=True)
+                return
+            if player.is_done():
+                await interaction.response.send_message("You already busted or stood.", ephemeral=True)
+                return
 
-        if game.all_players_done():
-            await process_end_game(interaction, game, followup=True)
+            player.stood = True
+            wait_msg = " Waiting for other players..." if (len(game.players) > 1) else ""
+            await interaction.response.send_message(
+                f"<@{player.user_id}> stands.{wait_msg}",
+                ephemeral=True
+            )
+
+            if game.all_players_done():
+                await process_end_game(interaction, game, followup=True)
 
 ##############################
 # COMMANDS
@@ -598,14 +608,11 @@ async def blackjack_leaderboard(ctx: Interaction):
     embed = Embed(title="🏆 Blackjack — Leaderboard", color=COLOR_LEADER)
 
     for rank, (uid, bal) in enumerate(sorted_bal, 1):
-        # Attempt to fetch the user as a member
         member = ctx.guild.get_member(int(uid))
         if member:
-            mention = member.mention  # This ensures a clickable mention
+            mention = member.mention
         else:
-            # fallback if user isn't in the server
             mention = f"<@{uid}>"
-
         formatted_bal = f"{bal:,}"
 
         if rank == 1:
@@ -623,7 +630,11 @@ async def blackjack_leaderboard(ctx: Interaction):
             inline=False
         )
 
-    await ctx.response.send_message(embed=embed)
+    # NEW: mention parsing
+    await ctx.response.send_message(
+        embed=embed,
+        allowed_mentions=AllowedMentions(users=True)
+    )
 
 ##############################
 # BOT READY & RUN
