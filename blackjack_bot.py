@@ -101,34 +101,29 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
 class HandOptionsView(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=180)
-        # FIX: Initialize the attribute to track if we've already added Hit/Stand
-        self.hit_stand_added = False
 
-   @nextcord.ui.button(label="View My Hand", style=nextcord.ButtonStyle.secondary, custom_id="view_hand")
-async def view_hand(self, button: nextcord.ui.Button, interaction: Interaction):
-    game = games.get(interaction.channel_id)
-    if not game:
-        await interaction.response.send_message("No active game.", ephemeral=True)
-        return
+    @nextcord.ui.button(label="View My Hand", style=nextcord.ButtonStyle.secondary, custom_id="view_hand")
+    async def view_hand(self, button: nextcord.ui.Button, interaction: Interaction):
+        game = games.get(interaction.channel_id)
+        if not game:
+            await interaction.response.send_message("No active game.", ephemeral=True)
+            return
 
-    player = next((p for p in game.players if p.user_id == interaction.user.id), None)
-    if not player:
-        await interaction.response.send_message("You're not in this game.", ephemeral=True)
-        return
+        player = next((p for p in game.players if p.user_id == interaction.user.id), None)
+        if not player:
+            await interaction.response.send_message("You're not in this game.", ephemeral=True)
+            return
 
-    hand_str = format_hand(player.hand)
-    hand_val = game.hand_value(player.hand)
+        hand_str = format_hand(player.hand)
+        hand_val = game.hand_value(player.hand)
 
-    # Create a custom view with buttons
-    view = PrivatePlayerView()
+        view = PrivatePlayerView()
 
-    # Send hand AND buttons in one ephemeral message
-    await interaction.response.send_message(
-        content=f"Your current hand: **{hand_str}** (Value: {hand_val})",
-        view=view,
-        ephemeral=True
-    )
-
+        await interaction.response.send_message(
+            content=f"Your current hand: **{hand_str}** (Value: {hand_val})",
+            view=view,
+            ephemeral=True
+        )
 
 class HitButton(nextcord.ui.Button):
     def __init__(self):
