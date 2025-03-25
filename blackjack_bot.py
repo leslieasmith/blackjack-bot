@@ -139,22 +139,32 @@ class HitButton(nextcord.ui.Button):
         if not player:
             await interaction.response.send_message("You're not in this game.", ephemeral=True)
             return
+
         if player.is_done():
             await interaction.response.send_message("You already busted or stood.", ephemeral=True)
             return
 
+        # Draw a card
         game.draw_card_for_player(player)
         new_card = format_hand([player.hand[-1]])
         new_val = game.hand_value(player.hand)
 
         message = f"You drew **{new_card}** (Hand Value: {new_val})."
+
         if new_val > 21:
             player.busted = True
             message += f"\n<@{player.user_id}> busts with {new_val}!"
+            await interaction.response.send_message(message, ephemeral=True)
+        else:
+            # Send updated hand + buttons
+            hand_str = format_hand(player.hand)
+            view = PrivatePlayerView()
+            await interaction.response.send_message(
+                content=f"Your current hand: **{hand_str}** (Value: {new_val})",
+                view=view,
+                ephemeral=True
+            )
 
-        await interaction.response.send_message(message, ephemeral=True)
-
-        # Check if all players are done
         if game.all_players_done():
             await process_end_game(interaction, game, followup=True)
 
