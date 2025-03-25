@@ -429,10 +429,19 @@ async def blackjack_leaderboard(ctx: Interaction):
     if not balances:
         await ctx.response.send_message("No one has a balance yet!", ephemeral=True)
         return
+    
     sorted_bal = sorted(balances.items(), key=lambda x: x[1], reverse=True)
     lines = ["**Blackjack Leaderboard**"]
+
     for rank, (uid, bal) in enumerate(sorted_bal, 1):
-        lines.append(f"**{rank}.** <{uid}> - {bal} chips")
+        try:
+            user = await bot.fetch_user(int(uid))
+            username = user.display_name #Or user.name if unavailable 
+        except Exception:
+            username - f"User {uid}" #If user can't be fetched
+
+        lines.append(f"**{rank}.** {username} - {bal} chips")
+        
     await ctx.response.send_message("\n".join(lines), ephemeral=False)
 
 ##############################
