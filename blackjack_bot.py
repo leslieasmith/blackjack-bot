@@ -21,7 +21,7 @@ DATA_FILE = "balances.json"
 logging.basicConfig(level=logging.INFO)
 
 # Define color constants
-COLOR_PRIMARY   = 0x5865F2  # Blurple - e.g., for deal messages
+COLOR_PRIMARY   = 0x5865F2  # Blurple - for deal messages
 COLOR_SUCCESS   = 0x2ECC71  # Green - for game over
 COLOR_INFO      = 0x3498DB  # Info blue - for new game start
 COLOR_ACCENT    = 0x9B59B6  # Purple - for join messages
@@ -150,13 +150,14 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
     dealer_img_bytes = generate_hand_image(game.dealer_hand)
     embed = Embed(
         title="🏁 Blackjack — Game Over",
-        description=f"**Dealer's final hand:** `{format_hand(game.dealer_hand)}` (Value: {d_val})",
         color=COLOR_SUCCESS
     )
+    # Set dealer image at the top
     if dealer_img_bytes is not None:
         embed.set_image(url="attachment://dealer_final.png")
-    for line in lines:
-        embed.add_field(name="\u200b", value=line, inline=False)
+    # Add a field for the game results (win/lose/tie messages)
+    embed.add_field(name="Results", value="\n".join(lines), inline=False)
+    # Add a field for updated balances
     embed.add_field(name="💰 Updated Balances", value="\n".join(
         f"<@{p.user_id}>: {balances[str(p.user_id)]} chips" for p in game.players
     ), inline=False)
@@ -175,23 +176,21 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
 # INTERACTIVE GAME ACTIONS 
 ##############################
 
-# This view replaces the separate slash commands for joining and dealing.
+# JoinDealView now provides Join and Deal buttons, updates embed live, and disables buttons after dealing.
 class JoinDealView(nextcord.ui.View):
     def __init__(self, game, host_id):
         super().__init__(timeout=180)
         self.game = game
         self.host_id = host_id
-        # Keep track of joined players for live updates
-        self.joined_players = []
+        self.joined_players = [f"<@{host_id}>"]  # Host is the first player
 
     @nextcord.ui.button(label="Join Game", style=nextcord.ButtonStyle.primary, custom_id="join_game")
     async def join(self, button: nextcord.ui.Button, interaction: Interaction):
         user_id = str(interaction.user.id)
-        # Check if already joined
         if any(p.user_id == interaction.user.id for p in self.game.players):
             await interaction.response.send_message("You have already joined!", ephemeral=True)
             return
-        # For simplicity, set a default bet (or you can prompt for it)
+        # For simplicity, set a default bet of 100 chips
         bet = 100
         if balances.get(user_id, DEFAULT_BALANCE) < bet:
             await interaction.response.send_message("Not enough chips to join.", ephemeral=True)
@@ -199,11 +198,11 @@ class JoinDealView(nextcord.ui.View):
         balances[user_id] -= bet
         self.game.add_player(int(user_id), bet)
         self.joined_players.append(f"<@{user_id}>")
-        # Update the embed to show joined players
+        # Update embed description with current pot and joined players
         new_description = (
-            f"💰 **Pot:** {self.game.pot} chips\n" +
-            "Players Joined: " + ", ".join(self.joined_players) + "\n" +
-            "Host can click **Deal Cards** once everyone is ready."
+            f"💰 **Pot:** {self.game.pot} chips\n"
+            "Players Joined: " + ", ".join(self.joined_players) + "\n"
+            "Host, click **Deal Cards** when ready."
         )
         embed = interaction.message.embeds[0]
         embed.description = new_description
@@ -219,10 +218,10 @@ class JoinDealView(nextcord.ui.View):
         for child in self.children:
             child.disabled = True
         await interaction.message.edit(view=self)
-        # Call the blackjack_deal logic
+        # Call the blackjack_deal logic (simulate a slash command call)
         await blackjack_deal(interaction)
 
-# Updated "View My Hand" view remains the same as before
+# When players view their hand, they see a simplified message and the card image.
 class HandOptionsView(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=180)
@@ -245,7 +244,7 @@ class HandOptionsView(nextcord.ui.View):
         file = nextcord.File(fp=img_bytes, filename="hand.png")
         view = PrivatePlayerView()
         await interaction.response.send_message(
-            content=f"🂠 **Your current hand (Value: {hand_val})**:",
+            content=f"🂠 Your current hand value: **{hand_val}**",
             file=file,
             view=view,
             ephemeral=True
@@ -284,7 +283,7 @@ class HitButton(nextcord.ui.Button):
             file = nextcord.File(fp=img_bytes, filename="hand.png")
             view = PrivatePlayerView()
             await interaction.response.send_message(
-                content=f"🂠 **Your current hand (Value: {new_val})**:",
+                content=f"🂠 Your current hand value: **{new_val}**",
                 file=file,
                 view=view,
                 ephemeral=True
@@ -476,7 +475,6 @@ async def blackjack_start(ctx: Interaction, bet: int):
     games[ctx.channel_id] = game
     balances[user_id] -= bet
     game.add_player(int(user_id), bet)
-    # Create a join/deal view and set the initial embed description with the host as first player
     view = JoinDealView(game, ctx.user.id)
     initial_description = (
         f"💰 **Pot:** {game.pot} chips\n"
@@ -489,9 +487,8 @@ async def blackjack_start(ctx: Interaction, bet: int):
         description=initial_description,
         color=COLOR_INFO
     )
-    # Save the message object to update later if needed
     msg = await ctx.response.send_message(embed=embed, view=view)
-    # Optionally, store msg in game (e.g., game.message = msg) for future live updates
+    # Optionally, store msg in game (e.g., game.message = msg) for live updates
 
 @bot.slash_command(description="Deal cards. The dealer's first card is revealed publicly as an image.")
 async def blackjack_deal(ctx: Interaction):
@@ -513,12 +510,10 @@ async def blackjack_deal(ctx: Interaction):
     if dealer_first_img:
         file = nextcord.File(fp=dealer_first_img, filename="dealer_first.png")
     view = HandOptionsView()
+    # Updated embed: Show only the dealer image first, then instructions
     embed = Embed(
         title="🃏 Blackjack — Cards Dealt!",
-        description=(
-            f"**Dealer’s first card:** `{game.dealer_hand[0][0]}{game.dealer_hand[0][1]}`\n"
-            "Click **View My Hand** below to see your cards and take action."
-        ),
+        description="Click **View My Hand** below to see your cards and take action.",
         color=COLOR_PRIMARY
     )
     if file:
