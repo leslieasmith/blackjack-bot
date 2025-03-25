@@ -30,7 +30,7 @@ COLOR_LEADER    = 0xF1C40F  # Gold - for leaderboard
 
 # Folder and image parameters
 CARD_FOLDER = "cards"
-CARD_WIDTH = 120  # Adjusted for clarity
+CARD_WIDTH = 120  # Adjust as needed
 CARD_SPACING = 10
 
 # Mapping for card image filenames:
@@ -141,24 +141,44 @@ def generate_hand_image(hand, card_folder=CARD_FOLDER, card_width=CARD_WIDTH, sp
     return output
 
 async def process_end_game(ctx: Interaction, game, followup: bool = False):
+    # Remove the game from the global dict
     games.pop(ctx.channel_id, None)
+
     game.dealer_draw()
     lines = game.distribute_pot()
     game.end_game()
     d_val = game.hand_value(game.dealer_hand)
     # Generate dealer final hand image
     dealer_img_bytes = generate_hand_image(game.dealer_hand)
+
+    # Create embed
     embed = Embed(
         title="🏁 Blackjack — Game Over",
         color=COLOR_SUCCESS,
-        description="**Dealer's final hand:**"
+        description=f"**Dealer's final hand (Value: {d_val}):**"
     )
     if dealer_img_bytes is not None:
         embed.set_image(url="attachment://dealer_final.png")
-    embed.add_field(name="🎯 Results", value="\n".join(lines), inline=False)
-    embed.add_field(name="💰 Updated Balances", value="\n".join(
-        f"<@{p.user_id}>: {balances[str(p.user_id)]} chips" for p in game.players
-    ), inline=False)
+
+    # Add a "Results" field
+    embed.add_field(
+        name="🎯 Results",
+        value="\n".join(lines) if lines else "No results.",
+        inline=False
+    )
+
+    # Add a "Updated Balances" field
+    embed.add_field(
+        name="💰 Updated Balances",
+        value="\n".join(
+            f"<@{p.user_id}>: {balances[str(p.user_id)]} chips"
+            for p in game.players
+        ),
+        inline=False
+    )
+
+    # If the message was triggered by a "followup" (like after a slash command's ephemeral flow),
+    # we use ctx.followup.send; otherwise, ctx.response.send_message
     if followup:
         if dealer_img_bytes:
             await ctx.followup.send(embed=embed, file=nextcord.File(dealer_img_bytes, filename="dealer_final.png"))
@@ -173,14 +193,12 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
 ##############################
 # INTERACTIVE GAME ACTIONS 
 ##############################
-
-# JoinDealView provides Join and Deal buttons; it updates the embed live with joined players and disables buttons after dealing.
 class JoinDealView(nextcord.ui.View):
     def __init__(self, game, host_id):
         super().__init__(timeout=180)
         self.game = game
         self.host_id = host_id
-        self.joined_players = [f"<@{host_id}>"]  # Host is the first player
+        self.joined_players = [f"<@{host_id}>"]  # Host is first
 
     @nextcord.ui.button(label="Join Game", style=nextcord.ButtonStyle.primary, custom_id="join_game")
     async def join(self, button: nextcord.ui.Button, interaction: Interaction):
@@ -188,7 +206,6 @@ class JoinDealView(nextcord.ui.View):
         if any(p.user_id == interaction.user.id for p in self.game.players):
             await interaction.response.send_message("You have already joined!", ephemeral=True)
             return
-        # For simplicity, set a default bet of 100 chips
         bet = 100
         if balances.get(user_id, DEFAULT_BALANCE) < bet:
             await interaction.response.send_message("Not enough chips to join.", ephemeral=True)
@@ -196,7 +213,7 @@ class JoinDealView(nextcord.ui.View):
         balances[user_id] -= bet
         self.game.add_player(int(user_id), bet)
         self.joined_players.append(f"<@{user_id}>")
-        # Update embed description with current pot and joined players
+
         new_description = (
             f"💰 **Pot:** {self.game.pot} chips\n"
             "Players Joined: " + ", ".join(self.joined_players) + "\n"
@@ -212,14 +229,11 @@ class JoinDealView(nextcord.ui.View):
         if interaction.user.id != self.host_id:
             await interaction.response.send_message("Only the host can deal the cards.", ephemeral=True)
             return
-        # Disable both buttons
         for child in self.children:
             child.disabled = True
         await interaction.message.edit(view=self)
-        # Call the blackjack_deal logic (simulate a slash command call)
         await blackjack_deal(interaction)
 
-# When players view their hand, they see a simplified message and the card image.
 class HandOptionsView(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=180)
@@ -234,6 +248,7 @@ class HandOptionsView(nextcord.ui.View):
         if not player:
             await interaction.response.send_message("You're not in this game.", ephemeral=True)
             return
+
         hand_val = game.hand_value(player.hand)
         img_bytes = generate_hand_image(player.hand)
         if img_bytes is None:
@@ -241,7 +256,7 @@ class HandOptionsView(nextcord.ui.View):
             return
         file = nextcord.File(fp=img_bytes, filename="hand.png")
         view = PrivatePlayerView()
-        # Simplified message text
+
         await interaction.response.send_message(
             content=f"🂠 Your current hand value: **{hand_val}**",
             file=file,
@@ -265,7 +280,7 @@ class HitButton(nextcord.ui.Button):
         if player.is_done():
             await interaction.response.send_message("You already busted or stood.", ephemeral=True)
             return
-        # Draw a card
+
         game.draw_card_for_player(player)
         new_val = game.hand_value(player.hand)
         if new_val > 21:
@@ -306,8 +321,10 @@ class StandButton(nextcord.ui.Button):
         if player.is_done():
             await interaction.response.send_message("You already busted or stood.", ephemeral=True)
             return
+
         player.stood = True
         await interaction.response.send_message(f"<@{player.user_id}> stands.", ephemeral=True)
+
         if game.all_players_done():
             await process_end_game(interaction, game, followup=True)
 
@@ -336,7 +353,7 @@ class PlayerState:
 ##############################
 class BlackjackGame:
     def __init__(self, host_id: int):
-        self.host_id = host_id      # ID of the game creator
+        self.host_id = host_id
         self.players = []
         self.dealer_hand = []
         self.deck = self._make_deck()
@@ -374,7 +391,7 @@ class BlackjackGame:
                 val += int(r)
             elif r in ["J", "Q", "K"]:
                 val += 10
-            else:  # Ace handling
+            else:  # Ace
                 val += 11
                 ace_count += 1
         while val > 21 and ace_count > 0:
@@ -479,15 +496,14 @@ async def blackjack_start(ctx: Interaction, bet: int):
         f"💰 **Pot:** {game.pot} chips\n"
         f"Players Joined: <@{ctx.user.id}>\n"
         "Click **Join Game** to participate.\n"
-        "Click **Deal Cards** when ready to play."
+        "Host, click **Deal Cards** when ready."
     )
     embed = Embed(
         title="🃏 New Blackjack Game Started!",
         description=initial_description,
         color=COLOR_INFO
     )
-    msg = await ctx.response.send_message(embed=embed, view=view)
-    # Optionally, store msg in game (e.g., game.message = msg) for live updates
+    await ctx.response.send_message(embed=embed, view=view)
 
 @bot.slash_command(description="Deal cards. The dealer's first card is revealed publicly as an image.")
 async def blackjack_deal(ctx: Interaction):
@@ -504,20 +520,28 @@ async def blackjack_deal(ctx: Interaction):
 
     game.deal_initial_cards()
     # Generate image for dealer's first card
+    d_val = game.hand_value([game.dealer_hand[0]])  # Value of single card
     dealer_first_img = generate_hand_image([game.dealer_hand[0]])
     file = None
     if dealer_first_img:
         file = nextcord.File(fp=dealer_first_img, filename="dealer_first.png")
+
     view = HandOptionsView()
-    # Updated embed: Show dealer's first card image first, then instructions
+    # Show dealer's first card with its value
     embed = Embed(
         title="🃏 Blackjack — Cards Dealt!",
-        description="**Dealer's first card:**",
+        description=f"**Dealer's first card (Value: {d_val}):**",
         color=COLOR_PRIMARY
     )
     if file:
         embed.set_image(url="attachment://dealer_first.png")
-    embed.add_field(name="\u200b", value="Click **View My Hand** below to see your cards, then choose **Hit** or **Stand**.", inline=False)
+
+    embed.add_field(
+        name="\u200b",
+        value="Click **View My Hand** below to see your cards, then choose **Hit** or **Stand**.",
+        inline=False
+    )
+
     await ctx.response.send_message(embed=embed, view=view, file=file)
 
 @bot.slash_command(description="Manually end the game.")
@@ -529,6 +553,7 @@ async def blackjack_end(ctx: Interaction):
     if ctx.user.id != game.host_id and not any(p.user_id == ctx.user.id for p in game.players):
         await ctx.response.send_message("You are not part of this game, so you cannot end it.", ephemeral=True)
         return
+
     game = games.pop(ctx.channel_id, None)
     await process_end_game(ctx, game, followup=False)
 
@@ -556,6 +581,7 @@ async def blackjack_leaderboard(ctx: Interaction):
     if not balances:
         await ctx.response.send_message("No one has a balance yet!", ephemeral=True)
         return
+
     sorted_bal = sorted(balances.items(), key=lambda x: x[1], reverse=True)[:15]
     embed = Embed(title="🏆 Blackjack Leaderboard", color=COLOR_LEADER)
     for rank, (uid, bal) in enumerate(sorted_bal, 1):
@@ -576,12 +602,14 @@ async def blackjack_leaderboard(ctx: Interaction):
                 username = user.name
         except Exception:
             username = f"User {uid}"
+
         formatted_bal = f"{bal:,}"
         embed.add_field(
             name=f"{medal} {username}", 
             value=f"{formatted_bal} chips", 
             inline=False
         )
+
     await ctx.response.send_message(embed=embed)
 
 ##############################
