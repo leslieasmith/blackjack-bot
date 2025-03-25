@@ -89,11 +89,25 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
     summary.append("\n**Updated Balances**:")
     for p in game.players:
         summary.append(f"<@{p.user_id}>: {balances[str(p.user_id)]} chips")
-    message = "\n".join(summary)
+  
+    embed = Embed(
+    title="🏁 Blackjack — Game Over",
+    description=f"**Dealer's final hand:** `{format_hand(game.dealer_hand)}` (Value: {d_val})",
+    color=0x2ECC71  # Green for end-of-game
+)
+
+    for line in lines:
+      embed.add_field(name="\u200b", value=line, inline=False)
+
+    embed.add_field(name="💰 Updated Balances", value="\n".join(
+      f"<@{p.user_id}>: {balances[str(p.user_id)]} chips" for p in game.players
+  ), inline=False)
+
     if followup:
-        await ctx.followup.send(message, ephemeral=False)
+      await ctx.followup.send(embed=embed)
     else:
-        await ctx.response.send_message(message, ephemeral=False)
+      await ctx.response.send_message(embed=embed)
+
 
 ##############################
 # INTERACTIVE GAME ACTIONS 
@@ -327,7 +341,13 @@ async def blackjack_replenish(ctx: Interaction):
         )
         return
     balances[user_id] = 100
-    await ctx.response.send_message("Your balance has been replenished to 100 chips!", ephemeral=True)
+
+    embed = Embed(
+    description="💰 Your balance has been replenished to **100 chips**!",
+    color=0x27AE60
+)
+    await ctx.response.send_message(embed=embed, ephemeral=True)
+
 
 @bot.slash_command(description="Start a new game of Blackjack with a bet (min: 10, max: 500).")
 async def blackjack_start(ctx: Interaction, bet: int):
@@ -354,10 +374,17 @@ async def blackjack_start(ctx: Interaction, bet: int):
     balances[user_id] -= bet
     game.add_player(int(user_id), bet)
 
-    await ctx.response.send_message(
-        f"**Blackjack game created!**\n**Pot:** {game.pot} chips\nUse `/blackjack_join` to join (before dealing), then `/blackjack_deal` to deal cards.",
-        ephemeral=False
-    )
+    embed = Embed(
+    title="🃏 New Blackjack Game Started!",
+    description=(
+        f"💰 **Pot:** {game.pot} chips\n"
+        "Use `/blackjack_join` to join before the cards are dealt.\n"
+        "Then use `/blackjack_deal` to begin."
+    ),
+    color=0x3498DB
+)
+    await ctx.response.send_message(embed=embed)
+
 
 @bot.slash_command(description="Join an active Blackjack game before cards are dealt.")
 async def blackjack_join(ctx: Interaction, bet: int):
@@ -385,10 +412,13 @@ async def blackjack_join(ctx: Interaction, bet: int):
     balances[user_id] -= bet
     game.add_player(int(user_id), bet)
 
-    await ctx.response.send_message(
-        f"<@{ctx.user.id}> joined! **Pot:** {game.pot} chips\n",
-        ephemeral=False
-    )
+    embed = Embed(
+    title=f"🙋 {ctx.user.display_name} Joined the Game!",
+    description=f"💰 **Pot:** {game.pot} chips",
+    color=0x9B59B6
+)
+    await ctx.response.send_message(embed=embed)
+
 
 @bot.slash_command(description="Deal cards. The dealer's first card is revealed publicly.")
 async def blackjack_deal(ctx: Interaction):
@@ -407,11 +437,15 @@ async def blackjack_deal(ctx: Interaction):
     dealer_card = f"{game.dealer_hand[0][0]}{game.dealer_hand[0][1]}"
     # DESIGN UPDATE: Use HandOptionsView with a "View My Hand" button.
     view = HandOptionsView()
-    await ctx.response.send_message(
-        f"**Dealer's first card: {dealer_card}**\nCards have been dealt!\nClick **View My Hand** below to see your cards.",
-        view=view,
-        ephemeral=False
-    )
+    embed = Embed(
+    title="🃏 Blackjack — Cards Dealt!",
+    description=(
+        f"**Dealer’s first card:** `{dealer_card}`\n"
+        "Click **View My Hand** below to see your cards and take action."
+    ),
+    color=0x5865F2
+)
+    await ctx.response.send_message(embed=embed, view=view)
 
 @bot.slash_command(description="Manually end the game.")
 async def blackjack_end(ctx: Interaction):
@@ -449,7 +483,7 @@ async def blackjack_leaderboard(ctx: Interaction):
         return
 
     sorted_bal = sorted(balances.items(), key=lambda x: x[1], reverse=True)[:15]
-    embed = Embed(title="**Blackjack Leaderboard**")
+    embed = Embed(title="🏆 Blackjack Leaderboard", color=0xF1C40F)
     for rank, (uid, bal) in enumerate(sorted_bal, 1):
         if rank == 1:
             medal = "🥇"
