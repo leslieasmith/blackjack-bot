@@ -45,6 +45,7 @@ balances = AutoSaveDict(DATA_FILE, {})
 # 1) Bot & Data Setup
 ##############################
 intents = nextcord.Intents.default()
+intents.members = True
 bot = commands.Bot(intents=intents)
 games = {}  # channel_id -> BlackjackGame
 
