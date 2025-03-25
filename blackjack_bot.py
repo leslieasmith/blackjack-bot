@@ -424,25 +424,46 @@ async def help(ctx: Interaction):
 ##############################
 # 15) Leaderboard Command
 ##############################
-@bot.slash_command(description="See the top players and their chip balances.")
+@bot.slash_command(description="See the top 15 players and their chip balances.")
 async def blackjack_leaderboard(ctx: Interaction):
     if not balances:
         await ctx.response.send_message("No one has a balance yet!", ephemeral=True)
         return
     
-    sorted_bal = sorted(balances.items(), key=lambda x: x[1], reverse=True)
-    lines = ["**Blackjack Leaderboard**"]
+    sorted_bal = sorted(balances.items(), key=lambda x: x[1], reverse=True)[:15]
+    embed = Embed(title="**Blackjack Leaderboard**")
 
     for rank, (uid, bal) in enumerate(sorted_bal, 1):
-        try:
-            user = await bot.fetch_user(int(uid))
-            username = user.display_name #Or user.name if unavailable 
-        except Exception:
-            username - f"User {uid}" #If user can't be fetched
+        #Emoji for top 3 ranks
+        if rank == 1:
+            medal = "🥇"
+        elif rank == 2:
+            medal = "🥈"
+        elif rank == 3:
+            medal = "🥉"
+        else:
+            medal = f"#{rank}"
 
-        lines.append(f"**{rank}.** {username} - {bal} chips")
+        #Get display name if possible    
+        try:
+            member = ctx.guild.get_member(int(uid))
+            if member:
+                  username = member.display_name
+            else:
+              user = await bot.fetch_user(int(uid))
+              username = user.name
+        except Exception:
+            username = f"User {uid}"
+
+        formatted_bal = f"{bal:,}"
+
+        embed.add_field(
+            name=f"{medal} {username}", 
+            value=f"{formatted_bal} chips", 
+            inline=False
+        )
         
-    await ctx.response.send_message("\n".join(lines), ephemeral=False)
+    await ctx.response.send_message(embed=embed)
 
 ##############################
 # 16) Bot Ready & Run
