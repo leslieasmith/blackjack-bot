@@ -125,13 +125,17 @@ class HandOptionsView(nextcord.ui.View):
             ephemeral=True
         )
 
-        # Add Hit and Stand buttons after viewing hand (only once).
-        if not self.hit_stand_added:
-            self.add_item(HitButton())
-            self.add_item(StandButton())
-            self.hit_stand_added = True
-            # Edit the original message to display the new buttons
-            await interaction.message.edit(view=self)
+            # Create a private view with Hit and Stand just for this user
+        private_view = nextcord.ui.View()
+        private_view.add_item(HitButton())
+        private_view.add_item(StandButton())
+
+        # Send ephemeral message with player's hand + action buttons
+        await interaction.response.send_message(
+            content=f"Your current hand: **{hand_str}** (Value: {hand_val})",
+            view=private_view,
+            ephemeral=True
+        )
 
 
 class HitButton(nextcord.ui.Button):
