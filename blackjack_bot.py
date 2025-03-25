@@ -364,10 +364,9 @@ class JoinDealView(nextcord.ui.View):
         # Public embed
         await interaction.response.send_message(embed=embed, file=file)
 
-        # Private instructions (no mention of ephemeral)
         instructions = "Click **View My Hand** below to see your cards, then choose **Hit** or **Stand**."
         view = HandOptionsView()
-        await interaction.followup.send(content=instructions, view=view, ephemeral=True)
+        await interaction.followup.send(content=instructions, view=view, ephemeral=False)
 
 ##############################
 # HAND OPTIONS VIEW
