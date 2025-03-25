@@ -132,65 +132,37 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
     game.dealer_draw()
     lines = game.distribute_pot()
     game.end_game()
-
     d_val = game.hand_value(game.dealer_hand)
     dealer_img_bytes = generate_hand_image(game.dealer_hand)
 
-    # [CHANGE] We'll send two messages:
-    #  1) Dealer's final hand image
-    #  2) Results + Updated balances
-
-    # 1) Dealer final hand image embed
-    if dealer_img_bytes:
-        embed1 = Embed(
-            title="🏁 Blackjack — Game Over",
-            description=f"**Dealer's final hand (Value: {d_val}):**",
-            color=COLOR_SUCCESS
-        )
-        file = nextcord.File(dealer_img_bytes, filename="dealer_final.png")
-        embed1.set_image(url="attachment://dealer_final.png")
-
-        if followup:
-            await ctx.followup.send(embed=embed1, file=file)
-        else:
-            await ctx.response.send_message(embed=embed1, file=file)
-    else:
-        # If no image, just do a normal embed
-        embed1 = Embed(
-            title="🏁 Blackjack — Game Over",
-            description=f"**Dealer's final hand (Value: {d_val}):**\n(No image found)",
-            color=COLOR_SUCCESS
-        )
-        if followup:
-            await ctx.followup.send(embed=embed1)
-        else:
-            await ctx.response.send_message(embed=embed1)
-
-    # 2) Results + Updated balances as a separate message
-    desc_parts = []
-    if lines:
-        desc_parts.append("**Results**")
-        desc_parts.append("\n".join(lines))
-
-    balance_lines = []
-    for p in game.players:
-        balance_lines.append(f"<@{p.user_id}>: {balances[str(p.user_id)]} chips")
-
-    if balance_lines:
-        desc_parts.append("**Updated Balances**")
-        desc_parts.append("\n".join(balance_lines))
-
-    final_desc = "\n".join(desc_parts) if desc_parts else "No results."
-
-    embed2 = Embed(
-        description=final_desc,
+    # Create a single embed for game over:
+    embed = Embed(
+        title="🏁 Blackjack — Game Over",
+        description=f"**Dealer's final hand (Value: {d_val}):**",
         color=COLOR_SUCCESS
     )
+    if dealer_img_bytes:
+        embed.set_image(url="attachment://dealer_final.png")
+    # Add a field for results
+    if lines:
+        embed.add_field(name="🎯 Results", value="\n".join(lines), inline=False)
+    # Add a field for updated balances
+    balance_lines = [f"<@{p.user_id}>: {balances[str(p.user_id)]} chips" for p in game.players]
+    if balance_lines:
+        embed.add_field(name="💰 Updated Balances", value="\n".join(balance_lines), inline=False)
+
+    file = nextcord.File(dealer_img_bytes, filename="dealer_final.png") if dealer_img_bytes else None
 
     if followup:
-        await ctx.followup.send(embed=embed2)
+        if file:
+            await ctx.followup.send(embed=embed, file=file)
+        else:
+            await ctx.followup.send(embed=embed)
     else:
-        await ctx.followup.send(embed=embed2)
+        if file:
+            await ctx.response.send_message(embed=embed, file=file)
+        else:
+            await ctx.response.send_message(embed=embed)
 
 ##############################
 # CLASSES & VIEWS
@@ -245,7 +217,7 @@ class BlackjackGame:
                 val += int(r)
             elif r in ["J", "Q", "K"]:
                 val += 10
-            else:  # Ace
+            else:
                 val += 11
                 ace_count += 1
         while val > 21 and ace_count > 0:
@@ -318,7 +290,6 @@ class JoinDealView(nextcord.ui.View):
         balances[user_id] -= bet
         self.game.add_player(int(user_id), bet)
         self.joined_players.append(f"<@{user_id}>")
-
         new_description = (
             f"💰 **Pot:** {self.game.pot} chips\n"
             "Players Joined: " + ", ".join(self.joined_players) + "\n"
@@ -327,7 +298,8 @@ class JoinDealView(nextcord.ui.View):
         embed = interaction.message.embeds[0]
         embed.description = new_description
         await interaction.message.edit(embed=embed, view=self)
-        await interaction.response.send_message("You have joined the game!", ephemeral=True)
+        # Public announcement for join (optional)
+        await interaction.followup.send(f"✅ {interaction.user.mention} joined the game!", ephemeral=False)
 
     @nextcord.ui.button(label="Deal Cards", style=nextcord.ButtonStyle.success, custom_id="deal_cards")
     async def deal(self, button: nextcord.ui.Button, interaction: Interaction):
@@ -343,16 +315,10 @@ class JoinDealView(nextcord.ui.View):
 
         self.game.deal_initial_cards()
 
-        # [CHANGE] Two-message approach for dealing:
-        #   1) Show dealer's first card in an embed
-        #   2) Send a second message with instructions + "View My Hand" button
-
-        # 1) Dealer first card embed
+        # Send dealer's first card and instructions in two messages
         d_val = self.game.hand_value([self.game.dealer_hand[0]])
         dealer_first_img = generate_hand_image([self.game.dealer_hand[0]])
-        file = None
-        if dealer_first_img:
-            file = nextcord.File(dealer_first_img, filename="dealer_first.png")
+        file = nextcord.File(dealer_first_img, filename="dealer_first.png") if dealer_first_img else None
 
         embed1 = Embed(
             title="🃏 Blackjack — Cards Dealt!",
@@ -362,18 +328,13 @@ class JoinDealView(nextcord.ui.View):
         if file:
             embed1.set_image(url="attachment://dealer_first.png")
 
-        # Disable the Deal button to prevent re-dealing
+        # Disable buttons after dealing
         for child in self.children:
             child.disabled = True
         await interaction.message.edit(view=self)
 
         await interaction.response.send_message(embed=embed1, file=file)
-
-        # 2) Instructions + "View My Hand" button in a second message
-        instructions = (
-            "Click **View My Hand** below to see your cards, "
-            "then choose **Hit** or **Stand**."
-        )
+        instructions = "Click **View My Hand** below to see your cards, then choose **Hit** or **Stand**."
         view = HandOptionsView()
         await interaction.followup.send(content=instructions, view=view)
 
@@ -443,13 +404,13 @@ class HitButton(nextcord.ui.Button):
             if img_bytes:
                 file = nextcord.File(fp=img_bytes, filename="hand.png")
                 await interaction.response.send_message(
-                    content=f"❌ You drew a **{drawn_card_str}** and busted with a hand value of **{new_val}**!",
+                    content=f"❌ You drew a **{drawn_card_str}** and busted with a hand value of **{new_val}**!\nYour turn is over. Waiting for other players...",
                     file=file,
                     ephemeral=True
                 )
             else:
                 await interaction.response.send_message(
-                    f"❌ You drew a **{drawn_card_str}** and busted with a hand value of **{new_val}**!",
+                    f"❌ You drew a **{drawn_card_str}** and busted with a hand value of **{new_val}**!\nYour turn is over. Waiting for other players...",
                     ephemeral=True
                 )
         else:
@@ -489,7 +450,7 @@ class StandButton(nextcord.ui.Button):
             return
 
         player.stood = True
-        await interaction.response.send_message(f"<@{player.user_id}> stands.", ephemeral=True)
+        await interaction.response.send_message(f"<@{player.user_id}> stands.\nYour turn is over. Waiting for other players...", ephemeral=True)
 
         if game.all_players_done():
             await process_end_game(interaction, game, followup=True)
