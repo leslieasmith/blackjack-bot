@@ -150,14 +150,12 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
     dealer_img_bytes = generate_hand_image(game.dealer_hand)
     embed = Embed(
         title="🏁 Blackjack — Game Over",
-        color=COLOR_SUCCESS
+        color=COLOR_SUCCESS,
+        description="**Dealer's final hand:**"
     )
-    # Set dealer image at the top
     if dealer_img_bytes is not None:
         embed.set_image(url="attachment://dealer_final.png")
-    # Add a field for the game results (win/lose/tie messages)
-    embed.add_field(name="Results", value="\n".join(lines), inline=False)
-    # Add a field for updated balances
+    embed.add_field(name="🎯 Results", value="\n".join(lines), inline=False)
     embed.add_field(name="💰 Updated Balances", value="\n".join(
         f"<@{p.user_id}>: {balances[str(p.user_id)]} chips" for p in game.players
     ), inline=False)
@@ -176,7 +174,7 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
 # INTERACTIVE GAME ACTIONS 
 ##############################
 
-# JoinDealView now provides Join and Deal buttons, updates embed live, and disables buttons after dealing.
+# JoinDealView provides Join and Deal buttons; it updates the embed live with joined players and disables buttons after dealing.
 class JoinDealView(nextcord.ui.View):
     def __init__(self, game, host_id):
         super().__init__(timeout=180)
@@ -243,6 +241,7 @@ class HandOptionsView(nextcord.ui.View):
             return
         file = nextcord.File(fp=img_bytes, filename="hand.png")
         view = PrivatePlayerView()
+        # Simplified message text
         await interaction.response.send_message(
             content=f"🂠 Your current hand value: **{hand_val}**",
             file=file,
@@ -480,7 +479,7 @@ async def blackjack_start(ctx: Interaction, bet: int):
         f"💰 **Pot:** {game.pot} chips\n"
         f"Players Joined: <@{ctx.user.id}>\n"
         "Click **Join Game** to participate.\n"
-        "Host, click **Deal Cards** when ready."
+        "Click **Deal Cards** when ready to play."
     )
     embed = Embed(
         title="🃏 New Blackjack Game Started!",
@@ -510,14 +509,15 @@ async def blackjack_deal(ctx: Interaction):
     if dealer_first_img:
         file = nextcord.File(fp=dealer_first_img, filename="dealer_first.png")
     view = HandOptionsView()
-    # Updated embed: Show only the dealer image first, then instructions
+    # Updated embed: Show dealer's first card image first, then instructions
     embed = Embed(
         title="🃏 Blackjack — Cards Dealt!",
-        description="Click **View My Hand** below to see your cards and take action.",
+        description="**Dealer's first card:**",
         color=COLOR_PRIMARY
     )
     if file:
         embed.set_image(url="attachment://dealer_first.png")
+    embed.add_field(name="\u200b", value="Click **View My Hand** below to see your cards, then choose **Hit** or **Stand**.", inline=False)
     await ctx.response.send_message(embed=embed, view=view, file=file)
 
 @bot.slash_command(description="Manually end the game.")
