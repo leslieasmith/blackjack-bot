@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 import random
 import json
-import asyncio  
+import asyncio
 import nextcord
 from nextcord.ext import commands
 from nextcord import Interaction, Embed
@@ -394,7 +394,6 @@ class HandOptionsView(nextcord.ui.View):
             return
 
         file = nextcord.File(fp=img_bytes, filename="hand.png")
-        # Buttons remain as they are
         private_view = PrivatePlayerView(player.user_id)
 
         await interaction.response.send_message(
@@ -518,7 +517,8 @@ async def blackjack_replenish(ctx: Interaction):
         return
     balances[user_id] = 100
     embed = Embed(
-        description="💰 Your balance has been replenished to **100 chips**!",
+        title="💰 Blackjack — Replenish",
+        description="Your balance has been replenished to **100 chips**!",
         color=0x27AE60
     )
     await ctx.response.send_message(embed=embed, ephemeral=True)
@@ -545,7 +545,6 @@ async def blackjack_start(ctx: Interaction, bet: int):
     balances[user_id] -= bet
     game.add_player(int(user_id), bet)
 
-    view = JoinDealView(game, ctx.user.id)
     desc = (
         f"💰 **Pot:** {game.pot} chips\n"
         f"Players Joined: <@{ctx.user.id}>\n"
@@ -553,10 +552,11 @@ async def blackjack_start(ctx: Interaction, bet: int):
         "Host, click **Deal Cards** when ready."
     )
     embed = Embed(
-        title="🃏 New Blackjack Game Started!",
+        title="🃏 Blackjack — New Game Started!",
         description=desc,
         color=COLOR_INFO
     )
+    view = JoinDealView(game, ctx.user.id)
     await ctx.response.send_message(embed=embed, view=view)
 
 @bot.slash_command(description="Manually end the game.")
@@ -574,7 +574,7 @@ async def blackjack_end(ctx: Interaction):
 @bot.slash_command(description="Get help using this bot.")
 async def help(ctx: Interaction):
     embed = Embed(
-        title="Blackjack Bot Commands",
+        title="❓ Blackjack — Help",
         description=(
             "Use the commands below to start, join, and play Blackjack.\n"
             "Once cards are dealt, click **View My Hand** to reveal your cards, then choose **Hit** or **Stand**."
@@ -593,27 +593,36 @@ async def blackjack_leaderboard(ctx: Interaction):
     if not balances:
         await ctx.response.send_message("No one has a balance yet!", ephemeral=True)
         return
+
     sorted_bal = sorted(balances.items(), key=lambda x: x[1], reverse=True)[:15]
-    embed = Embed(title="🏆 Blackjack Leaderboard", color=COLOR_LEADER)
+    embed = Embed(title="🏆 Blackjack — Leaderboard", color=COLOR_LEADER)
+
     for rank, (uid, bal) in enumerate(sorted_bal, 1):
-      mention = f"<@{uid}>"
+        # Attempt to fetch the user as a member
+        member = ctx.guild.get_member(int(uid))
+        if member:
+            mention = member.mention  # This ensures a clickable mention
+        else:
+            # fallback if user isn't in the server
+            mention = f"<@{uid}>"
 
-      formatted_bal = f"{bal:,}"
+        formatted_bal = f"{bal:,}"
 
-      if rank == 1:
-        medal = "🥇"
-      elif rank == 2:
-        medal = "🥈"
-      elif rank == 3:
-        medal = "🥉"
-      else:
-        medal = f"#{rank}"
+        if rank == 1:
+            medal = "🥇"
+        elif rank == 2:
+            medal = "🥈"
+        elif rank == 3:
+            medal = "🥉"
+        else:
+            medal = f"#{rank}"
 
-      embed.add_field(
-        name=f"{medal} {mention}",
-        value=f"{formatted_bal} chips",
-        inline=False
-      )
+        embed.add_field(
+            name=f"{medal} {mention}",
+            value=f"{formatted_bal} chips",
+            inline=False
+        )
+
     await ctx.response.send_message(embed=embed)
 
 ##############################
