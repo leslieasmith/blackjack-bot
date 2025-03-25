@@ -432,7 +432,7 @@ async def blackjack_leaderboard(ctx: Interaction):
     sorted_bal = sorted(balances.items(), key=lambda x: x[1], reverse=True)
     lines = ["**Blackjack Leaderboard**"]
     for rank, (uid, bal) in enumerate(sorted_bal, 1):
-        lines.append(f"**{rank}.** <@{uid}> - {bal} chips")
+        lines.append(f"**{rank}.** <{uid}> - {bal} chips")
     await ctx.response.send_message("\n".join(lines), ephemeral=False)
 
 ##############################

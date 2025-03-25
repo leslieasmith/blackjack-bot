@@ -5,3 +5,14 @@ __pycache__/
 *.log
 balances.json
 
+# System files
+.DS_Store
+
+# Backup files
+*_backup.py
+
+# Testing files
+test_*.py
+
+# Mistyped file?
+udo systemctl status blackjack-bot
