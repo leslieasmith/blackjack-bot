@@ -77,6 +77,8 @@ def format_hand(hand):
     return ", ".join([f"{r}{s}" for r, s in hand])
 
 async def process_end_game(ctx: Interaction, game, followup: bool = False):
+    games.pop(ctx.channel_id, None)
+
     game.dealer_draw()
     lines = game.distribute_pot()
     game.end_game()
@@ -98,7 +100,8 @@ async def process_end_game(ctx: Interaction, game, followup: bool = False):
 ##############################
 class HandOptionsView(nextcord.ui.View):
     def __init__(self):
-        super().__init__(timeout=180)  
+        super().__init__(timeout=180)
+        # FIX: Initialize the attribute to track if we've already added Hit/Stand
         self.hit_stand_added = False
 
     @nextcord.ui.button(label="View My Hand", style=nextcord.ButtonStyle.secondary, custom_id="view_hand")
@@ -107,22 +110,29 @@ class HandOptionsView(nextcord.ui.View):
         if not game:
             await interaction.response.send_message("No active game.", ephemeral=True)
             return
+
         player = next((p for p in game.players if p.user_id == interaction.user.id), None)
         if not player:
             await interaction.response.send_message("You're not in this game.", ephemeral=True)
             return
+
         hand_str = format_hand(player.hand)
         hand_val = game.hand_value(player.hand)
-        #Send an ephemeral message with the player's current hand.
+
+        # Send an ephemeral message with the player's current hand.
         await interaction.response.send_message(
-            f"Your current hand: **{hand_str}** (Value: {hand_val})", ephemeral=True
+            f"Your current hand: **{hand_str}** (Value: {hand_val})", 
+            ephemeral=True
         )
-        #Add Hit and Stand buttons after viewing hand.
+
+        # Add Hit and Stand buttons after viewing hand (only once).
         if not self.hit_stand_added:
             self.add_item(HitButton())
             self.add_item(StandButton())
             self.hit_stand_added = True
+            # Edit the original message to display the new buttons
             await interaction.message.edit(view=self)
+
 
 class HitButton(nextcord.ui.Button):
     def __init__(self):
@@ -133,6 +143,7 @@ class HitButton(nextcord.ui.Button):
         if not game:
             await interaction.response.send_message("No active game.", ephemeral=True)
             return
+
         player = next((p for p in game.players if p.user_id == interaction.user.id), None)
         if not player:
             await interaction.response.send_message("You're not in this game.", ephemeral=True)
@@ -144,14 +155,18 @@ class HitButton(nextcord.ui.Button):
         game.draw_card_for_player(player)
         new_card = format_hand([player.hand[-1]])
         new_val = game.hand_value(player.hand)
+
         message = f"You drew **{new_card}** (Hand Value: {new_val})."
         if new_val > 21:
             player.busted = True
             message += f"\n<@{player.user_id}> busts with {new_val}!"
+
         await interaction.response.send_message(message, ephemeral=True)
-        #Check if all players are done
+
+        # Check if all players are done
         if game.all_players_done():
             await process_end_game(interaction, game, followup=True)
+
 
 class StandButton(nextcord.ui.Button):
     def __init__(self):
@@ -162,6 +177,7 @@ class StandButton(nextcord.ui.Button):
         if not game:
             await interaction.response.send_message("No active game.", ephemeral=True)
             return
+
         player = next((p for p in game.players if p.user_id == interaction.user.id), None)
         if not player:
             await interaction.response.send_message("You're not in this game.", ephemeral=True)
@@ -172,8 +188,10 @@ class StandButton(nextcord.ui.Button):
 
         player.stood = True
         await interaction.response.send_message(f"<@{player.user_id}> stands.", ephemeral=True)
+
         if game.all_players_done():
             await process_end_game(interaction, game, followup=True)
+
 
 ##############################
 # PLAYER STATE
