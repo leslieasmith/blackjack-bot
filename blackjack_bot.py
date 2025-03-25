@@ -596,28 +596,24 @@ async def blackjack_leaderboard(ctx: Interaction):
     sorted_bal = sorted(balances.items(), key=lambda x: x[1], reverse=True)[:15]
     embed = Embed(title="🏆 Blackjack Leaderboard", color=COLOR_LEADER)
     for rank, (uid, bal) in enumerate(sorted_bal, 1):
-        if rank == 1:
-            medal = "🥇"
-        elif rank == 2:
-            medal = "🥈"
-        elif rank == 3:
-            medal = "🥉"
-        else:
-            medal = f"#{rank}"
-        try:
-            member = ctx.guild.get_member(int(uid))
-            if member:
-                username = member.display_name
-            else:
-                user = await bot.fetch_user(int(uid))
-                username = user.name
-        except Exception:
-            username = f"User {uid}"
-        embed.add_field(
-            name=f"{medal} {username}",
-            value=f"{bal:,} chips",
-            inline=False
-        )
+      mention = f"<@{uid}>"
+
+      formatted_bal = f"{bal:,}"
+
+      if rank == 1:
+        medal = "🥇"
+      elif rank == 2:
+        medal = "🥈"
+      elif rank == 3:
+        medal = "🥉"
+      else:
+        medal = f"#{rank}"
+
+      embed.add_field(
+        name=f"{medal} {mention}",
+        value=f"{formatted_bal} chips",
+        inline=False
+      )
     await ctx.response.send_message(embed=embed)
 
 ##############################
