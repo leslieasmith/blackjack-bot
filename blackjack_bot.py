@@ -94,7 +94,7 @@ class AutoSaveDict(dict):
         if os.path.exists(file):
             try:
                 with open(file, "r", encoding="utf-8") as fp:
-                    self.update(json.load(fp))
+                    super().update(json.load(fp))
             except json.JSONDecodeError:
                 log.error("Corrupt %s – starting with empty balances", file)
 
@@ -633,13 +633,24 @@ async def blackjack_leaderboard(inter: Interaction):
     for rank, (uid, bal) in enumerate(top, 1):
         medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, f"#{rank}")
         # try member name, then global name
+        # --- resolve a friendly name ---
         member = inter.guild.get_member(int(uid)) if inter.guild else None
         if not member:
             try:
-                member = await inter.guild.fetch_member(int(uid))  # type: ignore
-            except Exception:
+                member = await inter.guild.fetch_member(int(uid))  # REST
+            except nextcord.NotFound:
                 member = None
-        name = member.display_name if member else f"User {uid}"
+
+        if member:
+            # prefer server nickname → global display name → username
+            name = member.nick or member.global_name or member.name
+        else:
+            # user left the server (or deleted) – try global lookup
+            try:
+                user_obj = await bot.fetch_user(int(uid))
+                name = user_obj.global_name or user_obj.name
+            except Exception:
+                name = f"User {uid}"
         embed.add_field(name=f"{medal} {name}", value=f"{bal:,} chips", inline=False)
 
     await inter.response.send_message(
